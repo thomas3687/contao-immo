@@ -60,7 +60,8 @@ $GLOBALS['TL_DCA']['tl_immo_wohnungen'] = array
 		(
 			'keys' => array
 			(
-				'id' => 'primary'
+				'id' => 'primary',
+        'pid' => 'index'
 			)
 		),
 	),
