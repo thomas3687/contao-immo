@@ -1,0 +1,150 @@
+<div class="<?php echo $this->class; ?> block"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $this->style; ?>"<?php endif; ?>>
+
+<h1 class="immo_projekt_title"><?php echo $this->projekt['projektName'];?></h1>
+<div class="rs-columns ce_rs_columns_start">
+<div class="immo_projekt_desciption rs-column -large-col-5-3 -large-first -large-first-row -medium-col-5-3 -medium-first -medium-first-row -small-col-1-1 -small-first -small-last -small-first-row"><?php echo $this->projekt['projektBeschreibung'];?></div>
+<div class="immo_projekt_images rs-column -large-col-5-2 -large-last -large-first-row -medium-col-5-2 -medium-last -medium-first-row -small-col-1-1 -small-first -small-last">
+<div class="rs-columns ce_rs_columns_start">
+<?php
+for ($x = 0; $x < count($this->projektImages); $x++){
+  $image = $this->projektImages[$x];
+
+  if ($x%2 == 0){
+    ?>
+    <a href="<?php echo $image['singleSRC'];?>" data-lightbox="projekt">
+  <img class='rs-column -large-col-2-1 -large-first -large-first-row -medium-col-1-1 -medium-first -medium-first-row -small-col-1-1 -small-first -small-last' src='<?php echo $image['singleSRC'];?>'>
+    </a>
+  <?php
+  }else{
+    ?>
+    <a href="<?php echo $image['singleSRC'];?>" data-lightbox="projekt">
+  <img class='rs-column -large-col-2-1 -large-last -large-first-row -medium-col-1-1 -medium-first -medium-first-row -small-col-1-1 -small-first -small-last' src='<?php echo $image['singleSRC'];?>'>
+  </a>
+  <?php
+  }
+
+}?>
+</div>
+</div>
+</div>
+
+
+
+<?php
+
+ $etage = "";
+ $cssCounter = 0;
+
+ for ($x = 0; $x < count($this->wohnungen); $x++){
+   $wohnung = $this->wohnungen[$x];
+   //etagen titel
+   if ($etage != $wohnung['etage']){
+       $etage = $wohnung['etage'];
+       $etageName = '';
+
+       switch ($etage) {
+         case '0':
+              $etageName = 'Untergeschoss';
+              break;
+         case '1':
+              $etageName = 'Erdgeschoss';
+              break;
+         case '2':
+              $etageName = '1. Obergeschoss';
+              break;
+         case '3':
+              $etageName = '2. Obergeschoss';
+              break;
+         case '4':
+              $etageName = '3. Obergeschoss';
+              break;
+         case '5':
+              $etageName = '4. Obergeschoss';
+              break;
+         case '9':
+              $etageName = 'Penthouse';
+              break;
+
+         default:
+           break;
+       }
+if ($x != 0){ ?>
+</div>
+  <?php }
+
+       ?>
+<h2 class='immo_projekt_etage'><?php echo $etageName; ?></h2>
+<div class="rs-columns ce_rs_columns_start">
+<?php
+$cssCounter = 0;
+ }
+
+if ($cssCounter%3 == 0){
+  ?>
+<div class='immo_wohnung rs-column -large-col-3-1 -large-first -large-first-row -medium-col-2-1 -medium-first -medium-first-row -small-col-1-1 -small-first -small-last -small-first-row <?= $wohnung['verfuegbarkeit'] ?>'>
+  <?php
+}elseif ($cssCounter%3 == 1){
+  ?>
+<div class='immo_wohnung rs-column -large-col-3-1 -large-first-row -medium-col-2-1 -medium-last -medium-first-row -small-col-1-1 -small-first -small-last <?= $wohnung['verfuegbarkeit'] ?>'>
+  <?php
+}else{
+  ?>
+<div class='immo_wohnung rs-column -large-col-3-1 -large-last -large-first-row -medium-col-2-1 -medium-first -small-col-1-1 -small-first -small-last <?= $wohnung['verfuegbarkeit'] ?>'>
+  <?php
+}
+$cssCounter++;
+
+?>
+
+  <h3 class='immo_wohnung_title'><?= $wohnung['name'] ?></h3>
+  <div class='immo_wohnung_properties ce_rs_columns_start'>
+    <div class='rs-column -large-col-2-1 -large-first -large-first-row -medium-col-1-1 -medium-first -medium-first-row -small-col-1-1 -small-first -small-last'>
+        <p class='value'><?= $wohnung['wohnungstyp'] ?></p>
+        <p class='label'>Typ</p>
+    </div>
+    <div class='rs-column -large-col-2-1 -large-last -large-first-row -medium-col-1-1 -medium-first -medium-first-row -small-col-1-1 -small-first -small-last'>
+        <p class='value'><?= $wohnung['zimmer'] ?></p>
+        <p class='label'>Zimmer</p>
+    </div>
+    <div class='rs-column -large-col-2-1 -large-first -large-first-row -medium-col-1-1 -medium-first -medium-first-row -small-col-1-1 -small-first -small-last'>
+        <p class='value'><?= $wohnung['wohnflaeche'] ?> m²</p>
+        <p class='label'>Wohnfläche</p>
+    </div>
+    <div class='rs-column -large-col-2-1 -large-last -large-first-row -medium-col-1-1 -medium-first -medium-first-row -small-col-1-1 -small-first -small-last'>
+        <p class='value'><?= $wohnung['stellplatz'] ?></p>
+        <p class='label'>Stellplatz</p>
+    </div>
+    <div class='besondereAusstattung'><?= $wohnung['besondereAusstattung'] ?></div>
+</div>
+
+  <div class='immo_wohnung_images rs-columns ce_rs_columns_start'>
+
+    <?php
+    for ($i = 0; $i < count($wohnung['images']); $i++){
+      $image = $wohnung['images'][$i];
+
+      if ($i%2 == 0){
+        ?>
+          <a href="<?php echo $image['singleSRC'];?>" data-lightbox="<?= $wohnung['name'] ?>">
+              <img class='rs-column -large-col-2-1 -large-first -large-first-row -medium-col-2-1 -medium-first -medium-first-row -small-col-2-1 -small-first -small-first-row' src='<?php echo $image['singleSRC'];?>'>
+            </a>
+      <?php
+      }else{
+        ?>
+        <a href="<?php echo $image['singleSRC'];?>" data-lightbox="<?= $wohnung['name'] ?>">
+      <img class='rs-column -large-col-2-1 -large-last -large-first-row -medium-col-2-1 -medium-last -medium-first-row -small-col-2-1 -small-last -small-first-row' src='<?php echo $image['singleSRC'];?>'>
+    </a>
+      <?php
+      }
+    }?>
+  </div>
+
+</div>
+
+<?php
+//ende Wohnungen
+}
+?>
+</div>
+</div>
+</div>
