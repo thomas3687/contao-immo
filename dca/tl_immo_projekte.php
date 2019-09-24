@@ -19,6 +19,24 @@
     {
         return '<a href="' . $this->addToUrl($href . '&id=' . $row['id'], 1) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
     }
+
+    /**
+     * Dynamically add flags to the "multiSRC" field
+     *
+     * @param mixed         $varValue
+     * @param DataContainer $dc
+     *
+     * @return mixed
+     */
+    public function setMultiSrcFlags($varValue, DataContainer $dc)
+    {
+      if ($dc->activeRecord)
+      {
+        $GLOBALS['TL_DCA'][$dc->table]['fields'][$dc->field]['eval']['extensions'] = Config::get('validImageTypes');
+      }
+
+      return $varValue;
+    }
 }
 
 /**
@@ -152,7 +170,7 @@ $GLOBALS['TL_DCA']['tl_immo_projekte'] = array
 	*/
 	'palettes' => array
 	(
-		'default'       => '{projekt_legend},projektName,projektBeschreibung,besondereAusstattung;'
+		'default'       => '{projekt_legend},projektName,projektBeschreibung,besondereAusstattung;{source_legend},multiSRC'
 ),
 
 // Fields
@@ -184,46 +202,57 @@ Hier werden die eigentlichen felder der tabelle tl_turnierpaare bekannt gemacht.
 			'eval'      => array(
 				'mandatory'   => true,
                                 'unique'         => false,
-                                'maxlength'   => 255,
-				'tl_class'        => 'w50',
-
+                                'maxlength'   => 255
 			),
 			'sql'       => "varchar(255) NOT NULL default ''"
 		),
 		'projektBeschreibung'  => array
 		(
 			'label'     => &$GLOBALS['TL_LANG']['tl_immo_projekte']['projektBeschreibung'],
-			'inputType' => 'text',
-			'exclude'   => false,
-			'sorting'   => true,
-			'flag'      => 1,
-            'search'    => true,
-			'eval'      => array(
-				'mandatory'   => true,
-                                'unique'         => false,
-                                'maxlength'   => 255,
-				'tl_class'        => 'w50',
-
-			),
-			'sql'       => "varchar(255) NOT NULL default ''"
+      'exclude'                 => true,
+			'search'                  => true,
+			'inputType'               => 'textarea',
+			'eval'                    => array('mandatory'=>false, 'rte'=>'tinyMCE', 'helpwizard'=>true),
+			'explanation'             => 'insertTags',
+			'sql'                     => "mediumtext NULL"
 		),
 		'besondereAusstattung'  => array
 		(
 			'label'     => &$GLOBALS['TL_LANG']['tl_immo_projekte']['besondereAusstattung'],
-			'inputType' => 'text',
-			'exclude'   => false,
-			'sorting'   => true,
-			'flag'      => 1,
-            'search'    => true,
-			'eval'      => array(
-				'mandatory'   => false,
-                                'unique'         => false,
-                                'maxlength'   => 255,
-				'tl_class'        => 'w50',
-
-			),
-			'sql'       => "varchar(255) NOT NULL default ''"
-		)
+      'exclude'                 => true,
+			'search'                  => true,
+			'inputType'               => 'textarea',
+			'eval'                    => array('mandatory'=>false, 'rte'=>'tinyMCE', 'helpwizard'=>true),
+			'explanation'             => 'insertTags',
+			'sql'                     => "mediumtext NULL"
+		),
+    'multiSRC' => array
+    (
+      'label'                   => &$GLOBALS['TL_LANG']['tl_immo_projekte']['multiSRC'],
+      'exclude'                 => true,
+      'inputType'               => 'fileTree',
+      'eval'                    => array('multiple'=>true, 'fieldType'=>'checkbox', 'orderField'=>'orderSRC', 'files'=>true),
+      'sql'                     => "blob NULL",
+      'load_callback' => array
+      (
+        array('tl_immo_projekte', 'setMultiSrcFlags')
+      )
+    ),
+    'orderSRC' => array
+    (
+      'label'                   => &$GLOBALS['TL_LANG']['tl_immo_projekte']['sortOrder'],
+      'sql'                     => "blob NULL"
+    ),
+    'sortBy' => array
+    (
+      'label'                   => &$GLOBALS['TL_LANG']['tl_immo_projekte']['sortBy'],
+      'exclude'                 => true,
+      'inputType'               => 'select',
+      'options'                 => array('custom', 'name_asc', 'name_desc', 'date_asc', 'date_desc', 'random'),
+      'reference'               => &$GLOBALS['TL_LANG']['tl_immo_projekte'],
+      'eval'                    => array('tl_class'=>'w50'),
+      'sql'                     => "varchar(32) NOT NULL default ''"
+    )
 
        )
 );

@@ -31,4 +31,7 @@ $GLOBALS['FE_MOD']['immobilienverwaltung'] = array
 	//'immobilienverwaltung_projekt'     => 'ModuleImmobilienverwaltungProjekt'
 );
 
+array_insert($GLOBALS['TL_CTE'], 2, array('immobilienverwaltung' => array('immobilienverwaltung_projekt' => 'ProjektElement')));
+
+
 ?>

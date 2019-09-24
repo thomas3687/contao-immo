@@ -16,8 +16,10 @@
  */
 ClassLoader::addClasses(array
 (
-	// Modules
-	//'ModuleImmobilienverwaltungProjekt'   => 'system/modules/immo/modules/ModuleImmobilienverwaltungProjekt.php'
+  //Classes
+  'ImmoClass' => 'system/modules/immo/ImmoClass.php',
+	// Elements
+	'ProjektElement'   => 'system/modules/immo/elements/ProjektElement.php'
 ));
 
 
@@ -26,5 +28,5 @@ ClassLoader::addClasses(array
  */
 TemplateLoader::addFiles(array
 (
-	//'mod_immobilienverwaltung_projekt' => 'system/modules/immo/templates'
+	'mod_projekt_element' => 'system/modules/immo/templates'
 ));

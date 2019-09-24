@@ -22,9 +22,33 @@
 
     public function getVerfuegbarkeit(){
 
-      $klassen = array('verfügbar','reserviert','verkauft');
+      $values = array('verfügbar','reserviert','verkauft');
+      return $values;
 
-      return $klassen;
+    }
+
+      public function getEtagen(){
+
+        $etagen = array('Untergeschoss','Erdgeschoss','1. Obergeschoss','2. Obergeschoss','3. Obergeschoss','4. Obergeschoss','Penthouse');
+        return $etagen;
+      }
+
+      /**
+       * Dynamically add flags to the "multiSRC" field
+       *
+       * @param mixed         $varValue
+       * @param DataContainer $dc
+       *
+       * @return mixed
+       */
+      public function setMultiSrcFlags($varValue, DataContainer $dc)
+      {
+        if ($dc->activeRecord)
+        {
+          $GLOBALS['TL_DCA'][$dc->table]['fields'][$dc->field]['eval']['extensions'] = Config::get('validImageTypes');
+        }
+
+        return $varValue;
       }
 }
 
@@ -92,8 +116,8 @@ $GLOBALS['TL_DCA']['tl_immo_wohnungen'] = array
 
 		'label'             => array
 		(
-			'fields' => array('name'),
-			'format' => '%s',
+			'fields' => array('name', 'verfuegbarkeit'),
+			'format' => '%s (- %s -)',
 		),
 
 		//Globale Operationen
@@ -148,7 +172,7 @@ $GLOBALS['TL_DCA']['tl_immo_wohnungen'] = array
 	*/
 	'palettes' => array
 	(
-		'default'       => '{wohnung_legend},name,verfuegbarkeit,wohnungstyp,wohnflaeche,zimmer,stellplatz,bezugsfertig;'
+		'default'       => '{wohnung_legend},name,verfuegbarkeit,etage,wohnungstyp,wohnflaeche,zimmer,stellplatz,besondereAusstattung;{source_legend},multiSRC'
 ),
 
 // Fields
@@ -164,6 +188,18 @@ Hier werden die eigentlichen felder der tabelle tl_turnierpaare bekannt gemacht.
 		(
 			'sql' => "int(10) unsigned NOT NULL auto_increment"
 		),
+    'pid' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_immo_wohnungen']['pid'],
+            'foreignKey' => 'tl_immo_projekte.id',
+            'sql' => "int(10) unsigned NOT NULL default '0'",
+            'relation' => array(
+                'type' => 'belongsTo',
+                'load' => 'lazy'
+            ),
+            'eval' => array(
+                'doNotShow' => true
+            ),
+        ),
 	//Pflichtfeld
 		'tstamp' => array
 		(
@@ -186,6 +222,26 @@ Hier werden die eigentlichen felder der tabelle tl_turnierpaare bekannt gemacht.
 			),
 			'sql'       => "varchar(255) NOT NULL default ''"
 		),
+    'etage'  => array
+		(
+			'label'     => &$GLOBALS['TL_LANG']['tl_immo_wohnungen']['etage'],
+			'inputType' => 'select',
+      'options' => array('0','1','2','3','4','5','9'),
+      'reference' => &$GLOBALS['TL_LANG']['tl_immo_wohnungen']['etagen_values'],
+			'exclude'   => false,
+			'sorting'   => false,
+			'flag'      => 1,
+      'search'    => false,
+			'eval'      => array(
+				'mandatory'   => true,
+                                'unique'         => false,
+                                'maxlength'   => 255,
+				'tl_class'        => 'w50',
+
+			),
+			'sql'       => "varchar(255) NOT NULL default ''"
+		),
+
     'verfuegbarkeit'  => array
 		(
 			'label'     => &$GLOBALS['TL_LANG']['tl_immo_wohnungen']['verfuegbarkeit'],
@@ -215,7 +271,7 @@ Hier werden die eigentlichen felder der tabelle tl_turnierpaare bekannt gemacht.
 			'flag'      => 1,
             'search'    => true,
 			'eval'      => array(
-				'mandatory'   => true,
+				'mandatory'   => false,
                                 'unique'         => false,
                                 'maxlength'   => 255,
 				'tl_class'        => 'w50',
@@ -232,7 +288,7 @@ Hier werden die eigentlichen felder der tabelle tl_turnierpaare bekannt gemacht.
 			'flag'      => 1,
             'search'    => true,
 			'eval'      => array(
-				'mandatory'   => true,
+				'mandatory'   => false,
                                 'unique'         => false,
                                 'maxlength'   => 255,
 				'tl_class'        => 'w50',
@@ -249,7 +305,7 @@ Hier werden die eigentlichen felder der tabelle tl_turnierpaare bekannt gemacht.
 			'flag'      => 1,
             'search'    => true,
 			'eval'      => array(
-				'mandatory'   => true,
+				'mandatory'   => false,
                                 'unique'         => false,
                                 'maxlength'   => 255,
 				'tl_class'        => 'w50',
@@ -266,7 +322,7 @@ Hier werden die eigentlichen felder der tabelle tl_turnierpaare bekannt gemacht.
 			'flag'      => 1,
             'search'    => true,
 			'eval'      => array(
-				'mandatory'   => true,
+				'mandatory'   => false,
                                 'unique'         => false,
                                 'maxlength'   => 255,
 				'tl_class'        => 'w50',
@@ -274,23 +330,44 @@ Hier werden die eigentlichen felder der tabelle tl_turnierpaare bekannt gemacht.
 			),
 			'sql'       => "varchar(255) NOT NULL default ''"
 		),
-    'bezugsfertig'  => array
+    'besondereAusstattung'  => array
     (
-      'label'     => &$GLOBALS['TL_LANG']['tl_immo_wohnungen']['bezugsfertig'],
-      'inputType' => 'text',
-      'exclude'   => false,
-      'sorting'   => false,
-      'flag'      => 1,
-                        'search'    => false,
-      'eval'      => array(
-        'mandatory'   => false,
-                                'unique'         => false,
-                                'maxlength'   => 255,
-        'tl_class'        => 'w50',
+      'label'     => &$GLOBALS['TL_LANG']['tl_immo_wohnungen']['besondereAusstattung'],
+      'exclude'                 => true,
+      'search'                  => true,
+      'inputType'               => 'textarea',
+      'eval'                    => array('mandatory'=>false, 'rte'=>'tinyMCE', 'helpwizard'=>true, 'tl_class'=> 'clr'),
+      'explanation'             => 'insertTags',
+      'sql'                     => "mediumtext NULL"
+    ),
+    'multiSRC' => array
+    (
+      'label'                   => &$GLOBALS['TL_LANG']['tl_immo_wohnungen']['multiSRC'],
+      'exclude'                 => true,
+      'inputType'               => 'fileTree',
+      'eval'                    => array('multiple'=>true, 'fieldType'=>'checkbox', 'orderField'=>'orderSRC', 'files'=>true),
+      'sql'                     => "blob NULL",
+      'load_callback' => array
+      (
+        array('tl_immo_wohnungen', 'setMultiSrcFlags')
+      )
+    ),
+    'orderSRC' => array
+    (
+      'label'                   => &$GLOBALS['TL_LANG']['tl_immo_wohnungen']['sortOrder'],
+      'sql'                     => "blob NULL"
+    ),
+    'sortBy' => array
+    (
+      'label'                   => &$GLOBALS['TL_LANG']['tl_immo_wohnungen']['sortBy'],
+      'exclude'                 => true,
+      'inputType'               => 'select',
+      'options'                 => array('custom', 'name_asc', 'name_desc', 'date_asc', 'date_desc', 'random'),
+      'reference'               => &$GLOBALS['TL_LANG']['tl_content'],
+      'eval'                    => array('tl_class'=>'w50'),
+      'sql'                     => "varchar(32) NOT NULL default ''"
+    ),
 
-      ),
-      'sql'       => "varchar(255) NOT NULL default ''"
-    )
 
        )
 );
